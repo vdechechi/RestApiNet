@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RESTAPI.Data;
+using RESTAPI.DTOs.Stock;
+using RESTAPI.Mappers;
 using RESTAPI.Models;
 
 namespace RESTAPI.Controllers
@@ -21,9 +23,11 @@ namespace RESTAPI.Controllers
 
         public async Task<IActionResult> GetAll()
         {
-            var stocks = await _context.Stocks.AsNoTracking().ToListAsync();
+            var stocks = await _context.Stocks
+                                 .Select(s => s.ToStockDto())
+                                 .ToListAsync();
 
-            if(stocks == null || stocks.Count == 0) { return NoContent(); }
+            if (stocks == null || stocks.Count == 0) { return NoContent(); }
 
             return Ok(stocks);
 
@@ -39,7 +43,48 @@ namespace RESTAPI.Controllers
 
             if (stock == null) { return NotFound(); }
 
-            return Ok(stock);
+            return Ok(stock.ToStockDto());
+
+        }
+
+
+        [HttpPost]
+
+        public async Task<IActionResult> Create([FromBody] CreateStockRequestDto stockDto)
+        {
+
+            var stockModel =  stockDto.ToStockFromCreateDto();
+
+            _context.Stocks.Add(stockModel);
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetById), new { id = stockModel.Id }, stockModel.ToStockDto());
+
+
+        }
+
+        [HttpPut]
+        [Route("{id:int}")]
+
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateDto)
+        {
+
+            var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (stockModel == null)
+            {
+                return NotFound();
+            }
+                stockModel.Symbol = updateDto.Symbol;
+                stockModel.CompanyName = updateDto.CompanyName;
+                stockModel.Purchase = updateDto.Purchase;
+                stockModel.Industry = updateDto.Industry;
+                stockModel.MarketCap = updateDto.MarketCap;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(stockModel.ToStockDto());
 
         }
 
