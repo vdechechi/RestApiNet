@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RESTAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2fcdac3c9cb8ac27e8eb2553d02fa204f0c708c7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+caa3d5e3c0e6461ac25a395b239057cacf9b6ab1")]
 [assembly: System.Reflection.AssemblyProductAttribute("RESTAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RESTAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
