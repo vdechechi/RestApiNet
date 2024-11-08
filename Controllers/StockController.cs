@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RESTAPI.Data;
 using RESTAPI.DTOs.Stock;
+using RESTAPI.Interfaces;
 using RESTAPI.Mappers;
 using RESTAPI.Models;
 
@@ -12,9 +13,12 @@ namespace RESTAPI.Controllers
     [ApiController]
     public class StockController : ControllerBase
     {
+
         private readonly ApplicationDbContext _context;
-        public StockController(ApplicationDbContext context)
+        private readonly IStockRepository _stockRepo;
+        public StockController(ApplicationDbContext context, IStockRepository stockRepo)
         {
+            _stockRepo = stockRepo;
             _context = context;
             
         }
@@ -23,11 +27,10 @@ namespace RESTAPI.Controllers
 
         public async Task<IActionResult> GetAll()
         {
-            var stocks = await _context.Stocks
-                                 .Select(s => s.ToStockDto())
-                                 .ToListAsync();
 
-            if (stocks == null || stocks.Count == 0) { return NoContent(); }
+            var stocks = 
+
+            var stockDto = stocks.Select(s => s.ToStockDto());
 
             return Ok(stocks);
 
@@ -44,7 +47,7 @@ namespace RESTAPI.Controllers
             if (stock == null) { return NotFound(); }
 
             return Ok(stock.ToStockDto());
-
+             
         }
 
 
@@ -88,6 +91,25 @@ namespace RESTAPI.Controllers
 
         }
 
+        [HttpDelete]
+        [Route("{id:int}")]
 
-    }
+
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
+
+            if(stockModel == null)
+            {
+                return NotFound(id);
+            }
+            _context.Stocks.Remove(stockModel);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+
+    } 
 }
