@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RESTAPI.Data;
 using RESTAPI.DTOs.Stock;
+using RESTAPI.Helpers;
 using RESTAPI.Interfaces;
 using RESTAPI.Mappers;
 using RESTAPI.Models;
@@ -14,6 +15,8 @@ namespace RESTAPI.Controllers
     public class StockController : ControllerBase
     {
 
+
+
         private readonly ApplicationDbContext _context;
         private readonly IStockRepository _stockRepo;
         public StockController(ApplicationDbContext context, IStockRepository stockRepo)
@@ -25,10 +28,14 @@ namespace RESTAPI.Controllers
 
         [HttpGet] 
 
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
 
-            var stocks = await _stockRepo.GetAllAsync();
+
+            if (!ModelState.IsValid) { return BadRequest(); }
+
+
+            var stocks = await _stockRepo.GetAllAsync(query);
 
             var stockDto = stocks.Select(s => s.ToStockDto());
 
@@ -41,6 +48,9 @@ namespace RESTAPI.Controllers
 
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
+
+            if (!ModelState.IsValid) { return BadRequest(); }
+
 
             var stock = await _stockRepo.GetByIdAsync(id);
 
@@ -56,11 +66,18 @@ namespace RESTAPI.Controllers
         public async Task<IActionResult> Create([FromBody] CreateStockRequestDto stockDto)
         {
 
-            var stockModel =  stockDto.ToStockFromCreateDto();
+            if (!ModelState.IsValid) { return BadRequest(); }
 
-            await _stockRepo.CreateAsync(stockModel);
+            else
+            {
+                var stockModel = stockDto.ToStockFromCreateDto();
 
-            return CreatedAtAction(nameof(GetById), new { id = stockModel.Id }, stockModel.ToStockDto());
+                await _stockRepo.CreateAsync(stockModel);
+
+                return CreatedAtAction(nameof(GetById), new { id = stockModel.Id }, stockModel.ToStockDto());
+
+            }
+
 
 
         }
@@ -70,6 +87,8 @@ namespace RESTAPI.Controllers
 
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateDto)
         {
+
+            if (!ModelState.IsValid) { return BadRequest(); }
 
             var stockModel = await _stockRepo.UpdateAsync(id, updateDto);
 
@@ -89,15 +108,21 @@ namespace RESTAPI.Controllers
 
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var stockModel = await _stockRepo.DeleteAsync(id);
 
-            if(stockModel == null)
+            if (!ModelState.IsValid) { return BadRequest(); }
+            else
             {
-                return NotFound(id);
-            }
-           
+                var stockModel = await _stockRepo.DeleteAsync(id);
 
-            return NoContent();
+                if (stockModel == null)
+                {
+                    return NotFound(id);
+                }
+
+
+                return NoContent();
+            }
+
         }
 
 
