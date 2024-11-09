@@ -1,4 +1,5 @@
-﻿using RESTAPI.DTOs.Stock;
+﻿using RESTAPI.DTOs.Comment;
+using RESTAPI.DTOs.Stock;
 using RESTAPI.Models;
 
 namespace RESTAPI.Interfaces
@@ -11,7 +12,7 @@ namespace RESTAPI.Interfaces
 
         Task<Comment> CreateAsync(Comment commentModel);
 
-        Task<Comment?> UpdateAsync(int id, UpdateStockRequestDto stockDto);
+        Task<Comment?> UpdateAsync(int id, Comment commentModel);
 
         Task<Comment?> DeleteAsync(int id);
     }
