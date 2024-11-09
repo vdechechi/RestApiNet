@@ -9,7 +9,7 @@ namespace RESTAPI.Interfaces
 
         Task<Comment?> GetByIdAsync(int id); //First or default podem ser null
 
-        Task<Comment> CreateAsync(Stock stockModel);
+        Task<Comment> CreateAsync(Comment commentModel);
 
         Task<Comment?> UpdateAsync(int id, UpdateStockRequestDto stockDto);
 

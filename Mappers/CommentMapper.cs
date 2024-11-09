@@ -21,14 +21,14 @@ namespace RESTAPI.Mappers
             };
         }
 
-        public static Comment ToCommentMapperDto(this CreateCommentRequestDto stockDto)
+        public static Comment ToCommentFromCreate(this CreateCommentRequestDto commentDto, int stockId)
         {
             return new Comment
             {
-                Title = stockDto.Title,
-                Content = stockDto.Content,
-                CreatedOn = stockDto.CreatedOn,
-                StockId = stockDto.StockId,
+               Title = commentDto.Title,
+               Content = commentDto.Content,
+               StockId = stockId,
+
             };  
         }
     }
