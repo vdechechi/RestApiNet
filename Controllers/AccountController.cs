@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
 using RESTAPI.DTOs.Account;
+using RESTAPI.Interfaces;
 using RESTAPI.Models;
 
 namespace RESTAPI.Controllers
@@ -13,10 +14,12 @@ namespace RESTAPI.Controllers
     {
 
         private readonly UserManager<AppUser> _userManager;
+        private readonly ITokenService _tokenService;
 
-        public AccountController(UserManager<AppUser> userManager)
+        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService)
         {
             _userManager = userManager;
+            _tokenService = tokenService;
             
         }
 
@@ -44,7 +47,12 @@ namespace RESTAPI.Controllers
 
                     if (roleResult.Succeeded)
                     {
-                        return Ok("User Created");
+                        return Ok(new UserDto
+                        {
+                            UserName = appUser.UserName,
+                            Email = appUser.Email,
+                            Token = _tokenService.CreateToken(appUser)
+                        });
                     }
                     else
                     {
