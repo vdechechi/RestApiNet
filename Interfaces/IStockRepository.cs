@@ -10,6 +10,8 @@ namespace RESTAPI.Interfaces
 
         Task<Stock?> GetByIdAsync(int id); //First or default podem ser null
 
+        Task<Stock?> GetBySymbolAsync(string symbol); //First or default podem ser null
+
         Task<Stock> CreateAsync(Stock stockModel);
 
         Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto stockDto);

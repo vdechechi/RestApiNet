@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RESTAPI.Data;
 using RESTAPI.DTOs.Stock;
@@ -26,8 +27,10 @@ namespace RESTAPI.Controllers
             
         }
 
-        [HttpGet] 
+        [HttpGet]
 
+
+        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
 
@@ -37,7 +40,7 @@ namespace RESTAPI.Controllers
 
             var stocks = await _stockRepo.GetAllAsync(query);
 
-            var stockDto = stocks.Select(s => s.ToStockDto());
+            var stockDto = stocks.Select(s => s.ToStockDto()).ToList();
 
             return Ok(stockDto);
 

@@ -51,13 +51,13 @@ namespace RESTAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "037b6e20-bf3b-4e2a-aa2c-82ade41338cd",
+                            Id = "621fc889-cb3d-4a06-b06a-563b0a0b36aa",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "9841101b-ecfe-460f-a2be-86bd0668288d",
+                            Id = "2649024c-3ccc-4d7b-a772-5f01f337e985",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -242,6 +242,10 @@ namespace RESTAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -258,9 +262,26 @@ namespace RESTAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AppUserId");
+
                     b.HasIndex("StockId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("RESTAPI.Models.Portifolio", b =>
+                {
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("StockId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AppUserId", "StockId");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("Portifolios");
                 });
 
             modelBuilder.Entity("RESTAPI.Models.Stock", b =>
@@ -350,16 +371,50 @@ namespace RESTAPI.Migrations
 
             modelBuilder.Entity("RESTAPI.Models.Comment", b =>
                 {
+                    b.HasOne("RESTAPI.Models.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("RESTAPI.Models.Stock", "Stock")
                         .WithMany("Comments")
                         .HasForeignKey("StockId");
 
+                    b.Navigation("AppUser");
+
                     b.Navigation("Stock");
+                });
+
+            modelBuilder.Entity("RESTAPI.Models.Portifolio", b =>
+                {
+                    b.HasOne("RESTAPI.Models.AppUser", "AppUser")
+                        .WithMany("Portifolios")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RESTAPI.Models.Stock", "Stock")
+                        .WithMany("Portifolios")
+                        .HasForeignKey("StockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("Stock");
+                });
+
+            modelBuilder.Entity("RESTAPI.Models.AppUser", b =>
+                {
+                    b.Navigation("Portifolios");
                 });
 
             modelBuilder.Entity("RESTAPI.Models.Stock", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Portifolios");
                 });
 #pragma warning restore 612, 618
         }

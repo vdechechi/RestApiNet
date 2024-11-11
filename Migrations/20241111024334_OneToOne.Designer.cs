@@ -12,8 +12,8 @@ using RESTAPI.Data;
 namespace RESTAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241109201611_identity")]
-    partial class identity
+    [Migration("20241111024334_OneToOne")]
+    partial class OneToOne
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,20 @@ namespace RESTAPI.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "621fc889-cb3d-4a06-b06a-563b0a0b36aa",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "2649024c-3ccc-4d7b-a772-5f01f337e985",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -231,6 +245,10 @@ namespace RESTAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -247,9 +265,26 @@ namespace RESTAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AppUserId");
+
                     b.HasIndex("StockId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("RESTAPI.Models.Portifolio", b =>
+                {
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("StockId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AppUserId", "StockId");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("Portifolios");
                 });
 
             modelBuilder.Entity("RESTAPI.Models.Stock", b =>
@@ -339,16 +374,50 @@ namespace RESTAPI.Migrations
 
             modelBuilder.Entity("RESTAPI.Models.Comment", b =>
                 {
+                    b.HasOne("RESTAPI.Models.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("RESTAPI.Models.Stock", "Stock")
                         .WithMany("Comments")
                         .HasForeignKey("StockId");
 
+                    b.Navigation("AppUser");
+
                     b.Navigation("Stock");
+                });
+
+            modelBuilder.Entity("RESTAPI.Models.Portifolio", b =>
+                {
+                    b.HasOne("RESTAPI.Models.AppUser", "AppUser")
+                        .WithMany("Portifolios")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RESTAPI.Models.Stock", "Stock")
+                        .WithMany("Portifolios")
+                        .HasForeignKey("StockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("Stock");
+                });
+
+            modelBuilder.Entity("RESTAPI.Models.AppUser", b =>
+                {
+                    b.Navigation("Portifolios");
                 });
 
             modelBuilder.Entity("RESTAPI.Models.Stock", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Portifolios");
                 });
 #pragma warning restore 612, 618
         }

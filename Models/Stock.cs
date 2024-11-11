@@ -2,6 +2,9 @@
 
 namespace RESTAPI.Models
 {
+
+    [Table("Stocks")]
+
     public class Stock
     {
         public int Id { get; set; }
@@ -19,6 +22,9 @@ namespace RESTAPI.Models
         public long MarketCap { get; set; }
 
         public List<Comment> Comments { get; set; } = new List<Comment>();
+            
+        public List<Portifolio> Portifolios { get; set; } = new List<Portifolio>();
+
 
 
     }

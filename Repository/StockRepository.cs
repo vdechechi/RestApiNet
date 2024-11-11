@@ -46,7 +46,7 @@ namespace RESTAPI.Repository
 
         public async Task<List<Stock>> GetAllAsync(QueryObject query)
         {
-            var stocks = _context.Stocks.Include(c => c.Comments).AsQueryable();
+            var stocks = _context.Stocks.Include(c => c.Comments).ThenInclude(a => a.AppUser).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.CompanyName))
             {
@@ -75,6 +75,11 @@ namespace RESTAPI.Repository
         {
             return await _context.Stocks.Include(s => s.Comments).FirstOrDefaultAsync(i => i.Id == id); 
 
+        }
+
+        public async Task<Stock?> GetBySymbolAsync(string symbol)
+        {
+            return await _context.Stocks.FirstOrDefaultAsync(s => s.Symbol == symbol);
         }
 
         public Task<bool> StockExists(int id)
